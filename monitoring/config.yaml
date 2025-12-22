@@ -1,0 +1,11 @@
+services:
+  - nginx
+  - ssh
+  - mysql
+
+thresholds:
+  cpu: 80
+  ram: 85
+  disk: 90
+
+interval: 60

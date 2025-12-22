@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Proactive Monitoring Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<h1>Proactive Monitoring Dashboard</h1>
+
+<button onclick="refreshAll()">🔄 Refresh</button>
+
+<h2>Resources</h2>
+<canvas id="chart" width="600"></canvas>
+
+<h2>Services</h2>
+<table border="1">
+  <thead>
+    <tr><th>Service</th><th>Status</th><th>Action</th></tr>
+  </thead>
+  <tbody id="services"></tbody>
+</table>
+
+<h2>Recent Incidents</h2>
+<pre id="incidents"></pre>
+
+<script>
+let chart;
+
+async function refreshMetrics() {
+  const r = await fetch("/api/metrics");
+  const d = await r.json();
+
+  if (!chart) {
+    chart = new Chart(document.getElementById("chart"), {
+      type: "bar",
+      data: {
+        labels: ["CPU", "RAM", "Disk"],
+        datasets: [{ label: "%", data: [d.cpu, d.ram, d.disk] }]
+      }
+    });
+  } else {
+    chart.data.datasets[0].data = [d.cpu, d.ram, d.disk];
+    chart.update();
+  }
+}
+
+async function refreshServices() {
+  const r = await fetch("/api/services");
+  const d = await r.json();
+  const t = document.getElementById("services");
+  t.innerHTML = "";
+
+  for (const s in d) {
+    t.innerHTML += `
+      <tr>
+        <td>${s}</td>
+        <td>${d[s]}</td>
+        <td><button onclick="restart('${s}')">Restart</button></td>
+      </tr>`;
+  }
+}
+
+async function restart(name) {
+  await fetch("/api/service/restart", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({name})
+  });
+  refreshServices();
+}
+
+async function refreshIncidents() {
+  const r = await fetch("/api/incidents");
+  const d = await r.json();
+  document.getElementById("incidents").textContent = d.join("\n");
+}
+
+function refreshAll() {
+  refreshMetrics();
+  refreshServices();
+  refreshIncidents();
+}
+
+refreshAll();
+</script>
+
+</body>
+</html>

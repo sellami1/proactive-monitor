@@ -1,0 +1,5 @@
+[Service]
+ExecStart=/opt/proactive-monitoring/venv/bin/python /opt/proactive-monitoring/monitoring/monitor.py
+WorkingDirectory=/opt/proactive-monitoring
+User=root
+Restart=always

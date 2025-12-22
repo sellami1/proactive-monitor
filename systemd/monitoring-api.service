@@ -1,0 +1,5 @@
+[Service]
+ExecStart=/opt/proactive-monitoring/venv/bin/uvicorn api:app --host 127.0.0.1 --port 8000
+WorkingDirectory=/opt/proactive-monitoring/web
+User=root
+Restart=always

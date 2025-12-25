@@ -1,2 +1,1 @@
-![](demo/demo.git)
-
+![](demo/demo.gif)
